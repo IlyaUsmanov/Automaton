@@ -2,10 +2,11 @@ from collections import defaultdict
 from queue import Queue
 from tools import powerset
 
+
 class Automaton:
     alphabet = ['a', 'b']
 
-    def __init__(self, orig = None, graph = None, start = 0, finish = None, states = None):
+    def __init__(self, orig=None, graph=None, start=0, finish=None, states=None):
         if orig is None:
             if graph is None:
                 self.graph = defaultdict(lambda: defaultdict(set))
@@ -76,7 +77,7 @@ class Automaton:
                     tmp_automaton.graph[vertex].pop(word, 0)
         self._copy(tmp_automaton)
 
-    def _replace_epsilon_edges(self, vertex, current, used = None):
+    def _replace_epsilon_edges(self, vertex, current, used=None):
         if used is None:
             used = {vertex}
         if current in used:
@@ -98,9 +99,9 @@ class Automaton:
                 tmp_automaton._replace_epsilon_edges(vertex, current)
             tmp_automaton.graph[vertex].pop('', None)
         self._copy(tmp_automaton)
-            
+
     def _delete_multi_edges(self):
-        new_automaton = Automaton(start = 2 ** self.start)
+        new_automaton = Automaton(start=2 ** self.start)
         for cur_set in powerset(self.states):
             new_vertex = 0
             for old_vertex in cur_set:
@@ -123,7 +124,7 @@ class Automaton:
         self._delete_vertexes()
         self._delete_multi_edges()
         self._delete_vertexes()
-   
+
     def go(self, vertex, letter):
         return list(self.graph[vertex][letter])[0]
 
@@ -137,7 +138,7 @@ class Automaton:
                     self.graph[vertex][letter].add(new_vertex)
 
     def _split_nth_group(self, colors):
-        groups  = defaultdict(set)
+        groups = defaultdict(set)
         for vertex in self.states():
             key = {colors[vertex]}
             for letter in alphabet:
@@ -152,10 +153,10 @@ class Automaton:
         return changed
 
     def _split_by_groups(self):
-        colors = {vertex : int(vertex in self.finish) for vertex in self.states}
+        colors = {vertex: int(vertex in self.finish) for vertex in self.states}
         changed = True
         while changed:
-            groups  = defaultdict(set)
+            groups = defaultdict(set)
             for vertex in self.states:
                 key = [colors[vertex]]
                 for letter in Automaton.alphabet:
@@ -172,7 +173,7 @@ class Automaton:
     def minimize(self):
         self.make_full_deterministic()
         colors = self._split_by_groups()
-        new_automaton = Automaton(start = colors[self.start])
+        new_automaton = Automaton(start=colors[self.start])
         for vertex in self.states:
             for letter in Automaton.alphabet:
                 to = self.go(vertex, letter)
