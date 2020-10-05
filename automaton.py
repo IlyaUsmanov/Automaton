@@ -191,3 +191,9 @@ class Automaton:
         print('start:', self.start)
         for vertex in self.finish:
             print(vertex)
+
+    def in_language(self, word):
+        vertex = self.start
+        for letter in word:
+            vertex = self.go(vertex, letter)
+        return vertex in self.finish

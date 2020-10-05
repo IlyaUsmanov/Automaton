@@ -70,3 +70,10 @@ start: 1
 10
 ```
 the last numbers are numbers of finish states
+
+To run tests execute the following bash code in the repo directory:
+```shell
+coverage run -m unittest discover
+coverage html
+open htmlcov/index.html
+```
