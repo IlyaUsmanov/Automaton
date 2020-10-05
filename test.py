@@ -1,8 +1,8 @@
 import unittest
 from automaton import Automaton
-import sys, os
 
-#other tests in progress
+
+# other tests in progress
 class Test(unittest.TestCase):
     def testDetermine(self):
         my_automaton = Automaton()
@@ -13,7 +13,7 @@ class Test(unittest.TestCase):
         my_automaton.add_edge(0, 0, 'ba')
         my_automaton.add_finish(1)
         my_automaton.make_full_deterministic()
-        
+
         self.assertTrue(my_automaton.in_language(''))
         self.assertTrue(my_automaton.in_language('a'))
         self.assertTrue(my_automaton.in_language('b'))
@@ -21,6 +21,7 @@ class Test(unittest.TestCase):
         self.assertTrue(my_automaton.in_language('abba' * 50))
         self.assertFalse(my_automaton.in_language('bb'))
         self.assertFalse(my_automaton.in_language('abaa'))
+
     def testMinimize(self):
         my_automaton = Automaton()
         my_automaton.add_edge(0, 1, 'a')
