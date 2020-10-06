@@ -33,7 +33,7 @@ and methods:
   * add state vertex to set of finish states
 * **determine**()
   * convert automaton to deterministic
-* **make_full_deterministic**()
+* **make_complete_deterministic**()
   * convert automaton to complete deterministic
 * **minimize**()
   * convert automaton to minimal complete deterministic
