@@ -1,10 +1,11 @@
 import unittest
+from filecmp import cmp
 from automaton import Automaton
 
 
 # other tests in progress
 class Test(unittest.TestCase):
-    def testDetermine(self):
+    def testPrint(self):
         my_automaton = Automaton()
         my_automaton.add_edge(0, 1, '')
         my_automaton.add_edge(0, 1, 'a')
@@ -12,7 +13,22 @@ class Test(unittest.TestCase):
         my_automaton.add_edge(0, 0, 'ab')
         my_automaton.add_edge(0, 0, 'ba')
         my_automaton.add_finish(1)
-        my_automaton.make_full_deterministic()
+        with open('my_output.txt', 'w') as output_file:
+            my_automaton.print(output_file)
+
+        self.assertTrue(cmp('my_output.txt', 'correct_output.txt'))
+
+    def testDetermine(self):
+        my_automaton = Automaton()
+        my_automaton.add_edge(0, 1, '')
+        my_automaton.add_edge(0, 1, 'a')
+        my_automaton.add_edge(0, 1, 'b')
+        my_automaton.add_edge(0, 0, 'ab')
+        my_automaton.add_edge(0, 0, 'ba')
+        my_automaton.add_edge(0, 2, '')
+        my_automaton.add_edge(2, 0, '')
+        my_automaton.add_finish(1)
+        my_automaton.make_complete_deterministic()
 
         self.assertTrue(my_automaton.in_language(''))
         self.assertTrue(my_automaton.in_language('a'))

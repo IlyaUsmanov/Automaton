@@ -1,26 +1,18 @@
 from collections import defaultdict
 from queue import Queue
 from tools import powerset
+from sys import stdout
 
 
 class Automaton:
     alphabet = ['a', 'b']
 
-    def __init__(self, orig=None, graph=None, start=0, finish=None, states=None):
+    def __init__(self, orig=None, start=0):
         if orig is None:
-            if graph is None:
-                self.graph = defaultdict(lambda: defaultdict(set))
-            else:
-                self.graph = graph.copy()
+            self.graph = defaultdict(lambda: defaultdict(set))
             self.start = start
-            if finish is None:
-                self.finish = set()
-            else:
-                self.finish = finish.copy()
-            if states is None:
-                self.states = set()
-            else:
-                self.states = states().copy()
+            self.finish = set()
+            self.states = set()
         else:
             self._copy(orig)
 
@@ -128,7 +120,7 @@ class Automaton:
     def go(self, vertex, letter):
         return list(self.graph[vertex][letter])[0]
 
-    def make_full_deterministic(self):
+    def make_complete_deterministic(self):
         self.determine()
         new_vertex = max(self.states) + 1
         self.states.add(new_vertex)
@@ -136,21 +128,6 @@ class Automaton:
             for letter in Automaton.alphabet:
                 if len(self.graph[vertex][letter]) == 0:
                     self.graph[vertex][letter].add(new_vertex)
-
-    def _split_nth_group(self, colors):
-        groups = defaultdict(set)
-        for vertex in self.states():
-            key = {colors[vertex]}
-            for letter in alphabet:
-                neighbour = self.go(vertex, letter)
-                key.add(colors[neighbour])
-            key = frozenset(key)
-            groups[key].add(vertex)
-        changed = (max(colors.values()) + 1 != len(groups))
-        for (color, group) in enumerate(groups):
-            for vertex in group:
-                colors[vertex] = color
-        return changed
 
     def _split_by_groups(self):
         colors = {vertex: int(vertex in self.finish) for vertex in self.states}
@@ -171,7 +148,7 @@ class Automaton:
         return colors
 
     def minimize(self):
-        self.make_full_deterministic()
+        self.make_complete_deterministic()
         colors = self._split_by_groups()
         new_automaton = Automaton(start=colors[self.start])
         for vertex in self.states:
@@ -184,14 +161,14 @@ class Automaton:
         self._copy(new_automaton)
         self._delete_vertexes()
 
-    def print(self):
+    def print(self, output=stdout):
         for vertex in self.states:
             for word in self.graph[vertex]:
                 for to in self.graph[vertex][word]:
-                    print('(', vertex, ',', word, ') ->', to)
-        print('start:', self.start)
+                    print('(', vertex, ',', word, ') ->', to, file=output)
+        print('start:', self.start, file=output)
         for vertex in self.finish:
-            print(vertex)
+            print(vertex, file=output)
 
     def in_language(self, word):
         vertex = self.start
