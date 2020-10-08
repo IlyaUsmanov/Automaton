@@ -7,23 +7,23 @@ from sys import stdout
 class Automaton:
     alphabet = ['a', 'b']
 
-    def __init__(self, orig=None, start=0):
-        if orig is None:
+    def __init__(self, origin=None, start=0):
+        if origin is None:
             self.graph = defaultdict(lambda: defaultdict(set))
             self.start = start
             self.finish = set()
             self.states = set()
         else:
-            self._copy(orig)
+            self._copy(origin)
 
-    def _copy(self, orig):
+    def _copy(self, origin):
         self.graph = defaultdict(lambda: defaultdict(set))
-        for vertex in orig.graph:
-            for word in orig.graph[vertex]:
-                self.graph[vertex][word] = orig.graph[vertex][word].copy()
-        self.start = orig.start
-        self.finish = orig.finish.copy()
-        self.states = orig.states.copy()
+        for vertex in origin.graph:
+            for word in origin.graph[vertex]:
+                self.graph[vertex][word] = origin.graph[vertex][word].copy()
+        self.start = origin.start
+        self.finish = origin.finish.copy()
+        self.states = origin.states.copy()
 
     def add_edge(self, vertex, to, word):
         self.graph[vertex][word].add(to)
@@ -79,7 +79,7 @@ class Automaton:
             self.finish.add(vertex)
         for word in self.graph[current]:
             for next_vertex in self.graph[current][word]:
-                if (word == ''):
+                if word == '':
                     self._replace_epsilon_edges(vertex, next_vertex, used)
                 else:
                     self.graph[vertex][word].add(next_vertex)
@@ -94,19 +94,19 @@ class Automaton:
 
     def _delete_multi_edges(self):
         new_automaton = Automaton(start=2 ** self.start)
-        for cur_set in powerset(self.states):
+        for subset in powerset(self.states):
             new_vertex = 0
-            for old_vertex in cur_set:
+            for old_vertex in subset:
                 new_vertex |= 2 ** old_vertex
             new_automaton.states.add(new_vertex)
             for letter in Automaton.alphabet:
                 new_neighbour = 0
-                for old_vertex in cur_set:
+                for old_vertex in subset:
                     for old_neighbour in self.graph[old_vertex][letter]:
                         new_neighbour |= 2 ** old_neighbour
                 if new_neighbour != 0:
                     new_automaton.add_edge(new_vertex, new_neighbour, letter)
-            if len(cur_set & self.finish) != 0:
+            if len(subset & self.finish) != 0:
                 new_automaton.add_finish(new_vertex)
         self._copy(new_automaton)
 
